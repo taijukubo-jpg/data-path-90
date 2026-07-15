@@ -1,1 +1,161 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DATA PATH — 90日学習管理</title><link rel="stylesheet" href="style.css"></head><body><header><div><h1>DATA PATH / 90</h1><p>教材を探さず、今日やることだけに集中する。</p></div><div class="day">DAY <span id="dayNum">1</span></div></header><main class="wrap"><section class="homeDashboard"><article class="homePanel"><h2>📊 今日のDay</h2><div id="homeTodayDay" class="homeValue">Day 1</div><div id="homeTodayText" class="homeText"></div><button id="openTodayBtn">今日の予定を開く</button></article><article class="homePanel"><h2>✅ 今日のタスク</h2><div id="homeNextDay" class="homeValue">Day 1</div><div id="homeTaskPreview" class="homeText"></div><button id="continueBtn" class="primary">学習を続ける →</button></article><article class="homePanel"><h2>📖 学習ログ</h2><div id="homeLogTitle" class="homeValue">未記録</div><div id="homeLogPreview" class="homeText">3行レポートを保存すると、最新の学びがここに表示されます。</div><button id="openLogsBtn">ログ一覧を見る</button></article></section><section class="summary"><div class="card metric"><small>完了した学習日</small><b id="completeDays">0日</b></div><div class="card metric"><small>現在の予定</small><b id="currentDay">Day 1</b></div><div class="card metric"><small>次の学習Day</small><b id="nextStudyMetric">Day 1</b></div><div class="card metric"><small>進行状況</small><b id="progressStatus">予定どおり</b></div></section><section class="card schedule"><div><h2>学習できない日を除外</h2><small>登録日はカウントせず、以降の教材を自動で後ろへ送ります。登録済み：<b id="skipCount">0日</b></small></div><div><input id="dateInput" type="date"><button id="addSkip">不可日に追加</button></div><div id="chips" class="chips"></div></section><section id="recovery" class="recovery"></section><section class="card focus"><div class="nav"><button id="prev">←</button><div><small id="phase"></small><h2 id="focus" style="margin:5px 0"></h2><small id="estimate"></small></div><button id="next">→</button></div><div id="tasks" class="tasks"></div></section><section class="card"><h2>📖 3行レポート（学習ログ）</h2><div class="reportGrid"><div class="reportField"><label for="report1">① 今日理解したこと</label><textarea id="report1" maxlength="500" placeholder="例：Power BIはデータをテーブルとして管理することを理解した。"></textarea></div><div class="reportField"><label for="report2">② 今日できるようになったこと</label><textarea id="report2" maxlength="500" placeholder="例：カード・円グラフ・横棒グラフを作成できた。"></textarea></div><div class="reportField"><label for="report3">③ 明日学ぶ・試したいこと</label><textarea id="report3" maxlength="500" placeholder="例：グラフ同士の連動とフィルター操作を試したい。"></textarea></div></div><div class="reportActions"><button id="saveReport" class="primary">このDayのレポートを保存</button><span id="saveStatus" class="saveStatus" aria-live="polite"></span></div></section><section class="card"><div class="logHeader"><h2>📚 学習ログ一覧</h2><span id="logCount" class="logCount"></span></div><div id="logList" class="logList"></div></section><section class="card"><h2>🤖 生成AIへ学習状況を引き継ぐ</h2><p style="font-size:12px;line-height:1.7;color:var(--muted);margin-top:-4px">現在のDay、進捗、未完了タスク、最新の3行レポートを自然な文章にまとめます。ChatGPT、Copilot、Claude、Geminiなどへそのまま貼り付けられます。</p><div class="aiActions"><button id="buildAiContext" class="primary">引き継ぎ文を作成してコピー</button><button id="openChatGpt">ChatGPTを開く ↗</button></div><textarea id="aiContextPreview" class="aiPreview" readonly placeholder="「引き継ぎ文を作成」を押すと、ここに内容が表示されます。"></textarea><div id="aiCopyStatus" class="aiStatus" aria-live="polite"></div></section><section class="card"><h2>データ管理</h2><div class="footerActions"><button id="todayBtn" class="primary">今日の予定（Day）に戻る</button><button id="exportBtn">JSONをエクスポート</button><button id="importBtn">JSONをインポート</button><input id="fileInput" type="file" accept="application/json"></div><p style="font-size:10px;color:var(--muted)">進捗、3行レポート、学習ログはこのブラウザ内に自動保存されます。定期的にJSONを保存してください。</p></section></main><script src="script.js" defer></script></body></html>
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DATA PATH — 90日学習管理</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <h1>DATA PATH / 90</h1>
+      <p>教材を探さず、今日やることだけに集中する。</p>
+    </div>
+    <div class="day-display">DAY <span id="dayNum">1</span></div>
+  </header>
+
+  <main class="wrap">
+    <section class="home-dashboard" aria-label="ホーム">
+      <article class="home-panel">
+        <h2>📊 今日のDay</h2>
+        <div id="homeTodayDay" class="home-value">Day 1</div>
+        <div id="homeTodayText" class="home-text"></div>
+        <button id="openTodayBtn" type="button">今日の予定を開く</button>
+      </article>
+
+      <article class="home-panel">
+        <h2>✅ 今日のタスク</h2>
+        <div id="homeNextDay" class="home-value">Day 1</div>
+        <div id="homeTaskPreview" class="home-text"></div>
+        <button id="continueBtn" class="primary" type="button">学習を続ける →</button>
+      </article>
+
+      <article class="home-panel">
+        <h2>📖 学習ログ</h2>
+        <div id="homeLogTitle" class="home-value">未記録</div>
+        <div id="homeLogPreview" class="home-text">
+          3行レポートを保存すると、最新の学びがここに表示されます。
+        </div>
+        <button id="openLogsBtn" type="button">ログ一覧を見る</button>
+      </article>
+    </section>
+
+    <section class="summary">
+      <div class="card metric">
+        <small>完了した学習日</small>
+        <b id="completeDays">0日</b>
+      </div>
+      <div class="card metric">
+        <small>現在の予定</small>
+        <b id="currentDay">Day 1</b>
+      </div>
+      <div class="card metric">
+        <small>次の学習Day</small>
+        <b id="nextStudyMetric">Day 1</b>
+      </div>
+      <div class="card metric">
+        <small>進行状況</small>
+        <b id="progressStatus">予定どおり</b>
+      </div>
+    </section>
+
+    <section class="card schedule">
+      <div>
+        <h2>学習できない日を除外</h2>
+        <small>
+          登録日は90日カウントから除外し、以降の教材を自動で後ろへ送ります。
+          登録済み：<b id="skipCount">0日</b>
+        </small>
+      </div>
+      <div class="schedule-controls">
+        <input id="dateInput" type="date">
+        <button id="addSkip" type="button">不可日に追加</button>
+      </div>
+      <div id="chips" class="chips"></div>
+    </section>
+
+    <section id="recovery" class="recovery" aria-live="polite"></section>
+
+    <section class="card focus">
+      <div class="day-nav">
+        <button id="prev" type="button" aria-label="前のDay">←</button>
+        <div>
+          <small id="phase"></small>
+          <h2 id="focus"></h2>
+          <small id="estimate"></small>
+        </div>
+        <button id="next" type="button" aria-label="次のDay">→</button>
+      </div>
+      <div id="tasks" class="tasks"></div>
+    </section>
+
+    <section class="card">
+      <h2>📖 3行レポート（学習ログ）</h2>
+      <div class="report-grid">
+        <div class="report-field">
+          <label for="report1">① 今日理解したこと</label>
+          <textarea id="report1" maxlength="500"
+            placeholder="例：Power BIはデータをテーブルとして管理することを理解した。"></textarea>
+        </div>
+        <div class="report-field">
+          <label for="report2">② 今日できるようになったこと</label>
+          <textarea id="report2" maxlength="500"
+            placeholder="例：カード・円グラフ・横棒グラフを作成できた。"></textarea>
+        </div>
+        <div class="report-field">
+          <label for="report3">③ 明日学ぶ・試したいこと</label>
+          <textarea id="report3" maxlength="500"
+            placeholder="例：グラフ同士の連動とフィルター操作を試したい。"></textarea>
+        </div>
+      </div>
+      <div class="report-actions">
+        <button id="saveReport" class="primary" type="button">
+          このDayのレポートを保存
+        </button>
+        <span id="saveStatus" class="status-text" aria-live="polite"></span>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-header">
+        <h2>📚 学習ログ一覧</h2>
+        <span id="logCount" class="status-text"></span>
+      </div>
+      <div id="logList" class="log-list"></div>
+    </section>
+
+    <section class="card">
+      <h2>🤖 生成AIへ学習状況を引き継ぐ</h2>
+      <p class="muted">
+        現在のDay、進捗、未完了タスク、最新の3行レポートを自然な文章にまとめます。
+        ChatGPT、Copilot、Claude、Geminiなどへそのまま貼り付けられます。
+      </p>
+      <div class="ai-actions">
+        <button id="buildAiContext" class="primary" type="button">
+          引き継ぎ文を作成してコピー
+        </button>
+        <button id="openChatGpt" type="button">ChatGPTを開く ↗</button>
+      </div>
+      <textarea id="aiContextPreview" class="ai-preview" readonly
+        placeholder="ボタンを押すと、ここに引き継ぎ文が表示されます。"></textarea>
+      <div id="aiCopyStatus" class="status-text" aria-live="polite"></div>
+    </section>
+
+    <section class="card">
+      <h2>データ管理</h2>
+      <div class="footer-actions">
+        <button id="todayBtn" class="primary" type="button">今日の予定（Day）に戻る</button>
+        <button id="exportBtn" type="button">JSONをエクスポート</button>
+        <button id="importBtn" type="button">JSONをインポート</button>
+        <input id="fileInput" type="file" accept="application/json">
+      </div>
+      <p class="muted small">
+        進捗、3行レポート、学習ログはこのブラウザ内に自動保存されます。
+        定期的にJSONを保存してください。
+      </p>
+    </section>
+  </main>
+</body>
+</html>
