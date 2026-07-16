@@ -126,6 +126,109 @@
       <div id="logList" class="log-list"></div>
     </section>
 
+
+    <section class="card" id="glossarySection">
+      <div class="section-header">
+        <div>
+          <h2>📚 DATA PATH 用語集</h2>
+          <p class="muted glossary-intro">
+            学習中に出てきた専門用語を、自分の言葉と実務例で保存します。
+          </p>
+        </div>
+        <span id="glossaryCount" class="status-text">0語</span>
+      </div>
+
+      <div class="glossary-toolbar">
+        <input
+          id="glossarySearch"
+          type="search"
+          placeholder="用語・意味・実務例を検索"
+          aria-label="用語集を検索"
+        >
+        <select id="glossaryCategory" aria-label="カテゴリで絞り込み">
+          <option value="">すべてのカテゴリ</option>
+        </select>
+        <button id="toggleGlossaryForm" class="primary" type="button">
+          ＋ 用語を追加
+        </button>
+      </div>
+
+      <form id="glossaryForm" class="glossary-form is-hidden">
+        <input id="glossaryEditId" type="hidden">
+
+        <div class="glossary-form-grid">
+          <label>
+            <span>用語 *</span>
+            <input id="termName" type="text" maxlength="100" required
+              placeholder="例：セマンティックモデル">
+          </label>
+
+          <label>
+            <span>カテゴリ *</span>
+            <input id="termCategory" type="text" maxlength="50" required
+              list="glossaryCategoryOptions"
+              placeholder="例：Power BI">
+          </label>
+
+          <label class="glossary-wide">
+            <span>ひとことで説明 *</span>
+            <textarea id="termMeaning" maxlength="600" required
+              placeholder="専門知識がない人にも伝わる言葉で説明"></textarea>
+          </label>
+
+          <label class="glossary-wide">
+            <span>実務での使い方</span>
+            <textarea id="termExample" maxlength="600"
+              placeholder="例：コールセンターの応答率やAHTを共通定義で管理する"></textarea>
+          </label>
+
+          <label class="glossary-wide">
+            <span>関連用語</span>
+            <input id="termRelated" type="text" maxlength="300"
+              placeholder="カンマ区切り：メジャー, DAX, データモデル">
+          </label>
+        </div>
+
+        <datalist id="glossaryCategoryOptions">
+          <option value="分析基礎">
+          <option value="Power BI">
+          <option value="Microsoft Fabric">
+          <option value="SQL">
+          <option value="Python / Pandas">
+          <option value="Git / GitHub">
+          <option value="コールセンターKPI">
+        </datalist>
+
+        <div class="glossary-form-actions">
+          <button id="saveGlossaryTerm" class="primary" type="submit">
+            保存
+          </button>
+          <button id="cancelGlossaryEdit" type="button">キャンセル</button>
+          <span id="glossaryStatus" class="status-text" aria-live="polite"></span>
+        </div>
+      </form>
+
+      <details class="quick-import">
+        <summary>生成AIの回答から手早く追加する</summary>
+        <p class="muted">
+          下の形式で貼り付けて「取り込む」を押します。1項目ずつでも複数項目でも使えます。
+        </p>
+        <pre>用語: DAX
+カテゴリ: Power BI
+意味: Power BIで集計や分析を行うための数式言語
+実務例: 応答率、AHT、ASAなどのKPIを計算する
+関連用語: メジャー, 計算列, フィルターコンテキスト</pre>
+        <textarea id="glossaryQuickInput" class="quick-import-input"
+          placeholder="生成AIの回答を上の形式で貼り付け"></textarea>
+        <div class="glossary-form-actions">
+          <button id="importGlossaryText" type="button">貼り付け内容を取り込む</button>
+          <button id="copyGlossaryTemplate" type="button">追加用テンプレートをコピー</button>
+        </div>
+      </details>
+
+      <div id="glossaryList" class="glossary-list"></div>
+    </section>
+
     <section class="card">
       <h2>🤖 生成AIへ学習状況を引き継ぐ</h2>
       <p class="muted">
@@ -159,4 +262,3 @@
   </main>
 </body>
 </html>
-
