@@ -501,3 +501,222 @@ input[type="file"] {
     margin-top: 8px;
   }
 }
+
+
+/* =========================================================
+   用語集
+   ========================================================= */
+
+.glossary-intro {
+  margin: 4px 0 0;
+}
+
+.glossary-toolbar {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) 190px auto;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.glossary-toolbar input,
+.glossary-toolbar select,
+.glossary-form input,
+.glossary-form textarea,
+.quick-import-input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  color: #14243e;
+}
+
+.glossary-toolbar input,
+.glossary-toolbar select,
+.glossary-form input {
+  min-height: 42px;
+  padding: 9px 11px;
+}
+
+.glossary-toolbar button,
+.glossary-form-actions button {
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: #fff;
+  color: var(--blue);
+}
+
+.glossary-form {
+  margin-bottom: 16px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.glossary-form.is-hidden {
+  display: none;
+}
+
+.glossary-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 13px;
+}
+
+.glossary-form label {
+  display: grid;
+  gap: 6px;
+}
+
+.glossary-form label span {
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.glossary-form textarea {
+  min-height: 90px;
+  padding: 10px 11px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.glossary-wide {
+  grid-column: 1 / -1;
+}
+
+.glossary-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+  margin-top: 13px;
+}
+
+.quick-import {
+  margin-bottom: 16px;
+  padding: 13px 15px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  background: #fbfcfe;
+}
+
+.quick-import summary {
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.quick-import pre {
+  overflow-x: auto;
+  padding: 12px;
+  border-radius: 6px;
+  background: #10264a;
+  color: #fff;
+  font: 12px/1.7 Consolas, monospace;
+  white-space: pre-wrap;
+}
+
+.quick-import-input {
+  min-height: 150px;
+  padding: 11px;
+  resize: vertical;
+  font: 13px/1.7 Arial, "Noto Sans JP", sans-serif;
+}
+
+.glossary-list {
+  display: grid;
+  gap: 12px;
+}
+
+.glossary-empty {
+  padding: 22px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+.glossary-item {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.glossary-item-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.glossary-item-title {
+  margin: 0;
+  font-size: 18px;
+}
+
+.glossary-badge {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #edf3fc;
+  color: #40587a;
+  font-size: 10px;
+}
+
+.glossary-item-actions {
+  display: flex;
+  gap: 7px;
+  flex-shrink: 0;
+}
+
+.glossary-item-actions button {
+  padding: 6px 9px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: #fff;
+  color: var(--blue);
+  font-size: 11px;
+}
+
+.glossary-item-actions .danger {
+  color: #b42318;
+}
+
+.glossary-body {
+  display: grid;
+  gap: 9px;
+  margin-top: 13px;
+}
+
+.glossary-row {
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.glossary-row strong {
+  color: var(--navy);
+}
+
+@media (max-width: 700px) {
+  .glossary-toolbar,
+  .glossary-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .glossary-wide {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 460px) {
+  .glossary-item-header {
+    display: block;
+  }
+
+  .glossary-item-actions {
+    margin-top: 10px;
+  }
+}
