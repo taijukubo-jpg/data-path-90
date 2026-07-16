@@ -6,6 +6,7 @@
   <title>DATA PATH — 90日学習管理</title>
   <link rel="stylesheet" href="styles.css">
   <script src="app.js" defer></script>
+  <script src="glossary.js" defer></script>
 </head>
 <body>
   <header class="site-header">
@@ -39,6 +40,15 @@
           3行レポートを保存すると、最新の学びがここに表示されます。
         </div>
         <button id="openLogsBtn" type="button">ログ一覧を見る</button>
+      </article>
+
+      <article class="home-panel">
+        <h2>📚 用語集</h2>
+        <div id="homeGlossaryCount" class="home-value">0語</div>
+        <div id="homeGlossaryPreview" class="home-text">
+          用語を登録すると、最近追加した用語がここに表示されます。
+        </div>
+        <button id="openGlossaryBtn" type="button">用語集を開く</button>
       </article>
     </section>
 
@@ -226,7 +236,19 @@
         </div>
       </details>
 
-      <div id="glossaryList" class="glossary-list"></div>
+      <section class="glossary-subsection">
+        <h3>最近追加</h3>
+        <div id="recentGlossary" class="recent-glossary"></div>
+      </section>
+
+      <details id="missingTermsPanel" class="missing-terms-panel">
+        <summary>未登録の関連用語 <span id="missingTermCount">0語</span></summary>
+        <p class="muted">関連用語に書かれているものの、用語として未登録の項目です。定義済みのものは一括登録できます。</p>
+        <div id="missingTermList" class="missing-term-list"></div>
+        <button id="registerMissingTerms" type="button">定義済みの未登録用語を一括登録</button>
+      </details>
+
+      <div id="glossaryList" class="glossary-category-list"></div>
     </section>
 
     <section class="card">
