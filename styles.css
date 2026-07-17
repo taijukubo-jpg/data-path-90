@@ -728,3 +728,28 @@ input[type="file"] {
 .glossary-category-list{display:grid;gap:12px}.glossary-category{border:1px solid var(--line);border-radius:8px;background:#fff;overflow:hidden}.glossary-category>summary{display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding:15px 16px;font-weight:bold;list-style:none}.glossary-category>summary::-webkit-details-marker{display:none}.glossary-category>summary::before{content:'▶';font-size:10px;margin-right:8px}.glossary-category[open]>summary::before{content:'▼'}.glossary-category-title{display:flex;align-items:center}.glossary-category-count{color:var(--muted);font-size:11px}.glossary-category-body{display:grid;gap:10px;padding:0 14px 14px}.glossary-item{scroll-margin-top:18px}.glossary-item.is-target{outline:3px solid #b9cdf5;background:#f4f8ff}.related-links{display:flex;flex-wrap:wrap;gap:7px;margin-top:5px}.related-link,.related-missing{display:inline-block;padding:4px 8px;border-radius:999px;font-size:10px}.related-link{border:0;background:#edf3fc;color:var(--blue);cursor:pointer}.related-missing{background:#fff2df;color:#8a4b08}.category-more{justify-self:start;padding:7px 10px;border:1px solid var(--line);border-radius:5px;background:#fff;color:var(--blue)}.glossary-subsection{margin:16px 0}.glossary-subsection h3{margin:0 0 9px;font-size:14px}.recent-glossary{display:flex;flex-wrap:wrap;gap:8px}.recent-term{padding:7px 10px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--blue);cursor:pointer}.missing-terms-panel{margin:16px 0;padding:13px 15px;border:1px dashed #f0d2a9;border-radius:8px;background:#fffaf2}.missing-terms-panel summary{cursor:pointer;font-weight:bold}.missing-term-list{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}.missing-term-chip{padding:5px 8px;border-radius:999px;background:#fff2df;color:#8a4b08;font-size:10px}.missing-terms-panel>button{padding:9px 12px;border:1px solid var(--line);border-radius:5px;background:#fff;color:var(--blue)}
 @media(max-width:900px){.home-dashboard{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:700px){.home-dashboard{grid-template-columns:1fr}}
+
+
+/* =========================================================
+   DATA PATH v3.1
+   ========================================================= */
+.day-finish-card { display:flex; justify-content:space-between; align-items:center; gap:18px; }
+.day-finish-card h2 { margin-bottom:6px; }
+.day-finish-actions { display:flex; flex-direction:column; align-items:flex-end; gap:8px; min-width:260px; }
+.day-finish-actions button { padding:10px 14px; border:1px solid var(--line); border-radius:5px; }
+.glossary-form select { min-height:42px; padding:9px 11px; border:1px solid var(--line); border-radius:6px; background:#fff; }
+.term-title-line { display:flex; align-items:center; gap:8px; }
+.new-badge { display:inline-block; padding:3px 7px; border-radius:999px; background:#e9f8ef; color:#157347; font-size:9px; font-weight:bold; }
+.favorite-button { min-width:34px; font-size:18px !important; line-height:1; }
+.favorite-button.is-favorite { color:#b7791f !important; background:#fff8df !important; }
+.term-meta-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px 16px; padding:10px; border-radius:6px; background:#f8fafc; color:var(--muted); font-size:11px; }
+.section-header.compact { margin-bottom:10px; }
+.understanding-bars { display:grid; gap:10px; }
+.understanding-row { display:grid; grid-template-columns:minmax(130px,210px) 1fr 34px; gap:10px; align-items:center; }
+.understanding-label { display:flex; justify-content:space-between; gap:8px; font-size:12px; }
+.understanding-label small { color:var(--muted); }
+.understanding-track { height:10px; border-radius:999px; overflow:hidden; background:#e9eef5; }
+.understanding-track span { display:block; height:100%; border-radius:inherit; background:linear-gradient(90deg,#3268d8,#10264a); }
+.review-term { border-color:#f0d2a9 !important; background:#fffaf2 !important; }
+.glossary-category:not([open]) .glossary-category-body { display:none; }
+@media(max-width:700px){ .day-finish-card{display:block}.day-finish-actions{align-items:flex-start;min-width:0}.term-meta-grid{grid-template-columns:1fr}.understanding-row{grid-template-columns:1fr}.understanding-track{order:3} }

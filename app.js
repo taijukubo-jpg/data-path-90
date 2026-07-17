@@ -1,7 +1,7 @@
 'use strict';
 
 /* =========================================================
-   DATA PATH v2.0
+   DATA PATH v3.1
    - 学習計画
    - 進捗管理
    - 3行レポート
@@ -39,7 +39,8 @@ const element = Object.fromEntries(
     'report1', 'report2', 'report3', 'saveReport', 'saveStatus',
     'logCount', 'logList',
     'buildAiContext', 'openChatGpt', 'aiContextPreview', 'aiCopyStatus',
-    'todayBtn', 'exportBtn', 'importBtn', 'fileInput'
+    'todayBtn', 'exportBtn', 'importBtn', 'fileInput',
+    'copyDayFinish', 'dayFinishStatus'
   ].map((id) => [id, document.getElementById(id)])
 );
 
@@ -92,6 +93,7 @@ function loadState() {
 
 function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  document.dispatchEvent(new CustomEvent('datapath:statechanged'));
 }
 
 function escapeHtml(value) {
@@ -1084,6 +1086,16 @@ element.buildAiContext.addEventListener('click', async () => {
 
 element.openChatGpt.addEventListener('click', () => {
   window.open('https://chatgpt.com/', '_blank', 'noopener');
+});
+
+element.copyDayFinish.addEventListener('click', async () => {
+  const message = `DAY${activeDay()} 学習終了`;
+  try {
+    await copyTextToClipboard(message);
+    element.dayFinishStatus.textContent = `${message} をコピーしました。ChatGPTへ貼り付けてください。`;
+  } catch {
+    element.dayFinishStatus.textContent = `コピーできませんでした。${message} と入力してください。`;
+  }
 });
 
 element.exportBtn.addEventListener('click', exportState);

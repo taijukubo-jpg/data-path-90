@@ -3,10 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>DATA PATH — 90日学習管理</title>
+  <title>DATA PATH v3.1 — 90日学習管理</title>
   <link rel="stylesheet" href="styles.css">
   <script src="app.js" defer></script>
-  <script src="glossary.js" defer></script>
+  <script src="glossary-data.js" defer></script>
+  <script src="glossary-index.js" defer></script>
+  <script src="glossary-ui.js" defer></script>
 </head>
 <body>
   <header class="site-header">
@@ -50,6 +52,27 @@
         </div>
         <button id="openGlossaryBtn" type="button">用語集を開く</button>
       </article>
+
+      <article class="home-panel">
+        <h2>🆕 最近追加した用語</h2>
+        <div id="homeNewTermCount" class="home-value">0語</div>
+        <div id="homeNewTermPreview" class="home-text">直近3日以内に追加した用語を表示します。</div>
+        <button id="openNewTermsBtn" type="button">新しい用語を見る</button>
+      </article>
+
+      <article class="home-panel">
+        <h2>🧠 理解度</h2>
+        <div id="homeUnderstanding" class="home-value">未評価</div>
+        <div id="homeUnderstandingPreview" class="home-text">用語ごとに理解度を1〜5で記録できます。</div>
+        <button id="openUnderstandingBtn" type="button">理解度を見る</button>
+      </article>
+
+      <article class="home-panel">
+        <h2>🔁 復習おすすめ</h2>
+        <div id="homeReviewTitle" class="home-value">なし</div>
+        <div id="homeReviewPreview" class="home-text">理解度が低い用語を優先して表示します。</div>
+        <button id="openReviewBtn" type="button">復習対象を見る</button>
+      </article>
     </section>
 
     <section class="summary">
@@ -87,6 +110,17 @@
     </section>
 
     <section id="recovery" class="recovery" aria-live="polite"></section>
+
+    <section class="card day-finish-card">
+      <div>
+        <h2>🏁 今日の学習を終了する</h2>
+        <p class="muted">学習終了時に押すと「DAY○ 学習終了」をコピーします。ChatGPTへ貼り付けると、その日のまとめ・復習・追加用語の提案を受けられます。</p>
+      </div>
+      <div class="day-finish-actions">
+        <button id="copyDayFinish" class="primary" type="button">DAY終了メッセージをコピー</button>
+        <span id="dayFinishStatus" class="status-text" aria-live="polite"></span>
+      </div>
+    </section>
 
     <section class="card focus">
       <div class="day-nav">
@@ -180,6 +214,23 @@
               placeholder="例：Power BI">
           </label>
 
+          <label>
+            <span>初登場Day</span>
+            <input id="termFirstDay" type="number" min="1" max="90" placeholder="例：4">
+          </label>
+
+          <label>
+            <span>理解度</span>
+            <select id="termUnderstanding">
+              <option value="0">未評価</option>
+              <option value="1">★☆☆☆☆</option>
+              <option value="2">★★☆☆☆</option>
+              <option value="3">★★★☆☆</option>
+              <option value="4">★★★★☆</option>
+              <option value="5">★★★★★</option>
+            </select>
+          </label>
+
           <label class="glossary-wide">
             <span>ひとことで説明 *</span>
             <textarea id="termMeaning" maxlength="600" required
@@ -236,7 +287,31 @@
         </div>
       </details>
 
-      <section class="glossary-subsection">
+      <section class="glossary-subsection" id="understandingSection">
+        <div class="section-header compact">
+          <h3>カテゴリ別の理解度</h3>
+          <span id="understandingSummary" class="status-text"></span>
+        </div>
+        <div id="understandingBars" class="understanding-bars"></div>
+      </section>
+
+      <section class="glossary-subsection" id="favoritesSection">
+        <div class="section-header compact">
+          <h3>お気に入り</h3>
+          <span id="favoriteCount" class="status-text"></span>
+        </div>
+        <div id="favoriteGlossary" class="recent-glossary"></div>
+      </section>
+
+      <section class="glossary-subsection" id="reviewSection">
+        <div class="section-header compact">
+          <h3>復習おすすめ</h3>
+          <span id="reviewCount" class="status-text"></span>
+        </div>
+        <div id="reviewGlossary" class="recent-glossary"></div>
+      </section>
+
+      <section class="glossary-subsection" id="recentSection">
         <h3>最近追加</h3>
         <div id="recentGlossary" class="recent-glossary"></div>
       </section>
@@ -277,7 +352,7 @@
         <input id="fileInput" type="file" accept="application/json">
       </div>
       <p class="muted small">
-        進捗、3行レポート、学習ログはこのブラウザ内に自動保存されます。
+        進捗、3行レポート、用語集、理解度、お気に入りはこのブラウザ内に自動保存されます。
         定期的にJSONを保存してください。
       </p>
     </section>
