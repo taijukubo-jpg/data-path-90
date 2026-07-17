@@ -1,7 +1,7 @@
 'use strict';
 
 /* =========================================================
-   DATA PATH v3.1
+   DATA PATH v3.1.1
    - 学習計画
    - 進捗管理
    - 3行レポート
@@ -40,7 +40,7 @@ const element = Object.fromEntries(
     'logCount', 'logList',
     'buildAiContext', 'openChatGpt', 'aiContextPreview', 'aiCopyStatus',
     'todayBtn', 'exportBtn', 'importBtn', 'fileInput',
-    'copyDayFinish', 'dayFinishStatus'
+    'copyDayFinish', 'dayFinishPreview', 'dayFinishStatus'
   ].map((id) => [id, document.getElementById(id)])
 );
 
@@ -66,7 +66,8 @@ function createInitialState() {
     completed: {},
     unavailable: [],
     reports: {},
-    glossary: createSeedGlossary()
+    glossary: createSeedGlossary(),
+    dataVersion: '3.1.1'
   };
 }
 
@@ -78,7 +79,8 @@ function normalizeState(input) {
     completed: input?.completed && typeof input.completed === 'object' ? input.completed : {},
     unavailable: Array.isArray(input?.unavailable) ? input.unavailable : [],
     reports: input?.reports && typeof input.reports === 'object' ? input.reports : {},
-    glossary: Array.isArray(input?.glossary) ? input.glossary : createSeedGlossary()
+    glossary: Array.isArray(input?.glossary) ? input.glossary : createSeedGlossary(),
+    dataVersion: typeof input?.dataVersion === 'string' ? input.dataVersion : 'legacy'
   };
 }
 
@@ -1090,11 +1092,18 @@ element.openChatGpt.addEventListener('click', () => {
 
 element.copyDayFinish.addEventListener('click', async () => {
   const message = `DAY${activeDay()} 学習終了`;
+  element.dayFinishPreview.value = message;
+
   try {
     await copyTextToClipboard(message);
-    element.dayFinishStatus.textContent = `${message} をコピーしました。ChatGPTへ貼り付けてください。`;
+    element.dayFinishStatus.textContent =
+      `${message} をコピーしました。生成AIへ貼り付けてください。`;
   } catch {
-    element.dayFinishStatus.textContent = `コピーできませんでした。${message} と入力してください。`;
+    element.dayFinishStatus.textContent =
+      '自動コピーに失敗しました。表示された文章を手動でコピーしてください。';
+    element.dayFinishPreview.removeAttribute('readonly');
+    element.dayFinishPreview.focus();
+    element.dayFinishPreview.select();
   }
 });
 

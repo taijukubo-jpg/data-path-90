@@ -1,7 +1,7 @@
 'use strict';
 
 /* =========================================================
-   DATA PATH v3.0 - 用語集モジュール
+   DATA PATH v3.1.1 - 用語集カタログ
    ========================================================= */
 
 const GLOSSARY_PREVIEW_LIMIT = 5;
@@ -126,7 +126,7 @@ const GLOSSARY_CATALOG = [
   ['ブランチ','Git / GitHub','本体へ影響を与えず別の変更作業を進める分岐','用語集改修を別ブランチで試す',['Git','マージ','リポジトリ']],
   ['マージ','Git / GitHub','別ブランチの変更を1つに統合する操作','完成した用語集機能をmainへ取り込む',['ブランチ','Git','Pull Request']],
   ['Pull Request','Git / GitHub','変更内容を確認して本体への統合を提案する仕組み','用語集改修のレビューを依頼する',['マージ','ブランチ','GitHub']],
-  ['GitHub Pages','Git / GitHub','GitHubリポジトリのHTMLをWebサイトとして公開する機能','DATA PATHをURLで閲覧できるようにする',['GitHub','リポジトリ','パブリッシュ']]
+  ['GitHub Pages','Git / GitHub','GitHubリポジトリのHTMLをWebサイトとして公開する機能','DATA PATHをURLで閲覧できるようにする',['GitHub','リポジトリ','パブリッシュ']],
 
   ['Azure','クラウド','Microsoftが提供するクラウドサービス群の総称','Azure上のSQL ServerやAnalysis ServicesへPower BIから接続して分析する',['PaaS','SaaS','Azure Analysis Services']],
   ['データソース','分析基礎','Power BIやSQLが分析対象のデータを取得する元となる場所やシステム','CSV、Excel、SQL Server、Web、Azureから問い合わせ履歴やKPIデータを取得する',['Power BI','SQL Server','CSV','Excel','Azure']],

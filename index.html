@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>DATA PATH v3.1 — 90日学習管理</title>
+  <title>DATA PATH v3.1.1 — 90日学習管理</title>
   <link rel="stylesheet" href="styles.css">
   <script src="app.js" defer></script>
   <script src="glossary-data.js" defer></script>
@@ -110,17 +110,6 @@
     </section>
 
     <section id="recovery" class="recovery" aria-live="polite"></section>
-
-    <section class="card day-finish-card">
-      <div>
-        <h2>🏁 今日の学習を終了する</h2>
-        <p class="muted">学習終了時に押すと「DAY○ 学習終了」をコピーします。ChatGPTへ貼り付けると、その日のまとめ・復習・追加用語の提案を受けられます。</p>
-      </div>
-      <div class="day-finish-actions">
-        <button id="copyDayFinish" class="primary" type="button">DAY終了メッセージをコピー</button>
-        <span id="dayFinishStatus" class="status-text" aria-live="polite"></span>
-      </div>
-    </section>
 
     <section class="card focus">
       <div class="day-nav">
@@ -326,22 +315,52 @@
       <div id="glossaryList" class="glossary-category-list"></div>
     </section>
 
-    <section class="card">
-      <h2>🤖 生成AIへ学習状況を引き継ぐ</h2>
+    <section class="card" id="aiSection">
+      <h2>🤖 生成AI連携</h2>
       <p class="muted">
-        現在のDay、進捗、未完了タスク、最新の3行レポートを自然な文章にまとめます。
-        ChatGPT、Copilot、Claude、Geminiなどへそのまま貼り付けられます。
+        用途に合わせて文章を作成し、クリップボードへコピーします。
+        コピー後はChatGPT、Copilot、Claude、Geminiなどへ貼り付けてください。
       </p>
-      <div class="ai-actions">
-        <button id="buildAiContext" class="primary" type="button">
-          引き継ぎ文を作成してコピー
-        </button>
+
+      <div class="ai-option-grid">
+        <article class="ai-option">
+          <h3>学習状況を引き継ぐ</h3>
+          <p class="muted">
+            現在のDay、進捗、未完了タスク、最新の3行レポートをまとめます。
+            新しいチャットや別の生成AIへ学習状況を渡すときに使います。
+          </p>
+          <div class="ai-actions">
+            <button id="buildAiContext" class="primary" type="button">
+              引き継ぎ文を作成してコピー
+            </button>
+          </div>
+          <textarea id="aiContextPreview" class="ai-preview" readonly
+            placeholder="引き継ぎ文がここに表示されます。"></textarea>
+          <div id="aiCopyStatus" class="status-text" aria-live="polite"></div>
+        </article>
+
+        <article class="ai-option">
+          <h3>今日の学習終了を報告する</h3>
+          <p class="muted">
+            「DAY○ 学習終了」を作成します。貼り付けると、その日のまとめ、
+            復習ポイント、質問していないが押さえるべき用語の提案を受けられます。
+          </p>
+          <div class="ai-actions">
+            <button id="copyDayFinish" class="primary" type="button">
+              DAY終了メッセージを作成してコピー
+            </button>
+          </div>
+          <textarea id="dayFinishPreview" class="ai-preview ai-preview-short" readonly
+            placeholder="DAY終了メッセージがここに表示されます。"></textarea>
+          <div id="dayFinishStatus" class="status-text" aria-live="polite"></div>
+        </article>
+      </div>
+
+      <div class="ai-shared-actions">
         <button id="openChatGpt" type="button">ChatGPTを開く ↗</button>
       </div>
-      <textarea id="aiContextPreview" class="ai-preview" readonly
-        placeholder="ボタンを押すと、ここに引き継ぎ文が表示されます。"></textarea>
-      <div id="aiCopyStatus" class="status-text" aria-live="polite"></div>
     </section>
+
 
     <section class="card">
       <h2>データ管理</h2>

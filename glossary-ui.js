@@ -1,6 +1,6 @@
 'use strict';
 
-/* DATA PATH v3.1 - 用語集UI */
+/* DATA PATH v3.1.1 - 用語集UI */
 const glossaryElementIds = [
   'homeGlossaryCount','homeGlossaryPreview','openGlossaryBtn',
   'glossaryCount','glossarySearch','glossaryCategory','toggleGlossaryForm',
@@ -60,19 +60,41 @@ function normalizeGlossaryEntry(term) {
 
 function migrateGlossaryCatalog() {
   if (!Array.isArray(state.glossary)) state.glossary = [];
-  state.glossary = state.glossary.map(normalizeGlossaryEntry);
-  const existing = new Set(state.glossary.map(t => normalizeGlossaryName(t.name)));
-  let added = 0;
 
-  for (const term of GLOSSARY_CATALOG) {
-    if (!existing.has(normalizeGlossaryName(term.name))) {
-      state.glossary.push(normalizeGlossaryEntry({ ...term, id: makeGlossaryId() }));
-      existing.add(normalizeGlossaryName(term.name));
-      added += 1;
-    }
+  // 旧版データを壊さないよう、移行前の内容を一度だけ別キーへ退避する。
+  const backupKey = 'data-path-glossary-backup-before-3.1.1';
+  if (!localStorage.getItem(backupKey) && state.glossary.length) {
+    localStorage.setItem(backupKey, JSON.stringify(state.glossary));
   }
 
-  if (added) saveState();
+  state.glossary = state.glossary
+    .filter(term => term && typeof term === 'object' && term.name)
+    .map(normalizeGlossaryEntry);
+
+  const existing = new Set(
+    state.glossary.map(term => normalizeGlossaryName(term.name))
+  );
+
+  let added = 0;
+
+  for (const catalogTerm of GLOSSARY_CATALOG) {
+    const normalizedName = normalizeGlossaryName(catalogTerm.name);
+    if (existing.has(normalizedName)) continue;
+
+    state.glossary.push(
+      normalizeGlossaryEntry({
+        ...catalogTerm,
+        id: catalogTerm.id || makeGlossaryId()
+      })
+    );
+    existing.add(normalizedName);
+    added += 1;
+  }
+
+  const needsVersionUpdate = state.dataVersion !== '3.1.1';
+  state.dataVersion = '3.1.1';
+
+  if (added || needsVersionUpdate) saveState();
   return added;
 }
 
@@ -374,7 +396,7 @@ glossaryElement.openNewTermsBtn.addEventListener('click',()=>{glossaryElement.gl
 glossaryElement.openUnderstandingBtn.addEventListener('click',()=>document.getElementById('understandingSection').scrollIntoView({behavior:'smooth',block:'center'}));
 glossaryElement.openReviewBtn.addEventListener('click',()=>document.getElementById('reviewSection').scrollIntoView({behavior:'smooth',block:'center'}));
 
-document.addEventListener('datapath:statechanged', () => { migrateGlossaryCatalog(); renderGlossary(); });
+document.addEventListener('datapath:statechanged', () => { renderGlossary(); });
 
 const migratedCount = migrateGlossaryCatalog();
 renderGlossary();
