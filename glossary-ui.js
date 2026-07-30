@@ -1,10 +1,10 @@
 'use strict';
 
-/* DATA PATH v3.1.1 - 用語集UI */
+/* DATA PATH v4.0 - 用語集UI */
 const glossaryElementIds = [
   'homeGlossaryCount','homeGlossaryPreview','openGlossaryBtn',
   'glossaryCount','glossarySearch','glossaryCategory','toggleGlossaryForm',
-  'glossaryForm','glossaryEditId','termName','termCategory','termMeaning',
+  'glossaryForm','glossaryEditId','termName','termFormalName','termCategory','termMeaning',
   'termExample','termRelated','saveGlossaryTerm','cancelGlossaryEdit',
   'glossaryStatus','glossaryQuickInput','importGlossaryText',
   'copyGlossaryTemplate','recentGlossary','missingTermsPanel','missingTermCount',
@@ -51,6 +51,7 @@ function understandingStars(value) {
 function normalizeGlossaryEntry(term) {
   return {
     ...term,
+    formalName: String(term.formalName || '-').trim() || '-',
     firstDay: Number(term.firstDay) || null,
     understanding: Math.max(0, Math.min(5, Number(term.understanding) || 0)),
     favorite: Boolean(term.favorite),
@@ -62,7 +63,7 @@ function migrateGlossaryCatalog() {
   if (!Array.isArray(state.glossary)) state.glossary = [];
 
   // 旧版データを壊さないよう、移行前の内容を一度だけ別キーへ退避する。
-  const backupKey = 'data-path-glossary-backup-before-3.1.1';
+  const backupKey = 'data-path-glossary-backup-before-4.0';
   if (!localStorage.getItem(backupKey) && state.glossary.length) {
     localStorage.setItem(backupKey, JSON.stringify(state.glossary));
   }
@@ -91,8 +92,8 @@ function migrateGlossaryCatalog() {
     added += 1;
   }
 
-  const needsVersionUpdate = state.dataVersion !== '3.1.1';
-  state.dataVersion = '3.1.1';
+  const needsVersionUpdate = state.dataVersion !== '4.0';
+  state.dataVersion = '4.0';
 
   if (added || needsVersionUpdate) saveState();
   return added;
@@ -114,7 +115,7 @@ function filteredGlossaryTerms() {
     .filter(t => !category || t.category === category)
     .filter(t => {
       if (!keyword) return true;
-      return [t.name,t.category,t.meaning,t.example,...(t.related || [])]
+      return [t.name,t.formalName,t.category,t.meaning,t.example,...(t.related || [])]
         .join(' ').toLocaleLowerCase('ja').includes(keyword);
     })
     .sort((a,b) => a.name.localeCompare(b.name,'ja'));
@@ -159,6 +160,7 @@ function termCardHtml(term, map) {
       </div>
     </div>
     <div class="glossary-body">
+      <div class="glossary-row"><strong>正式名称：</strong>${escapeHtml(term.formalName || '-')}</div>
       <div class="glossary-row"><strong>意味：</strong>${escapeHtml(term.meaning)}</div>
       ${term.example ? `<div class="glossary-row"><strong>実務例：</strong>${escapeHtml(term.example)}</div>` : ''}
       <div class="term-meta-grid">
@@ -225,7 +227,7 @@ function bindGlossaryDynamicEvents() {
 function navigateToGlossaryTerm(id) {
   const term = state.glossary.find(t => t.id === id);
   if (!term) return;
-  glossaryElement.glossarySearch.value = term.name;
+  glossaryElement.glossarySearch.value = '';
   glossaryElement.glossaryCategory.value = '';
   renderGlossary();
   requestAnimationFrame(() => {
@@ -344,7 +346,7 @@ function openGlossaryForm(){glossaryElement.glossaryForm.classList.remove('is-hi
 function closeGlossaryForm(){resetGlossaryForm();glossaryElement.glossaryForm.classList.add('is-hidden')}
 function startGlossaryEdit(id){
   const t=state.glossary.find(x=>x.id===id); if(!t)return;
-  glossaryElement.glossaryEditId.value=t.id; glossaryElement.termName.value=t.name; glossaryElement.termCategory.value=t.category;
+  glossaryElement.glossaryEditId.value=t.id; glossaryElement.termName.value=t.name; glossaryElement.termFormalName.value=t.formalName||'-'; glossaryElement.termCategory.value=t.category;
   glossaryElement.termMeaning.value=t.meaning; glossaryElement.termExample.value=t.example||''; glossaryElement.termRelated.value=(t.related||[]).join(', ');
   glossaryElement.termFirstDay.value=t.firstDay||''; glossaryElement.termUnderstanding.value=String(t.understanding||0);
   glossaryElement.saveGlossaryTerm.textContent='更新'; glossaryElement.glossaryStatus.textContent='編集中'; openGlossaryForm();
@@ -353,7 +355,7 @@ function startGlossaryEdit(id){
 function saveGlossaryFromForm(){
   const id=glossaryElement.glossaryEditId.value;
   const old=state.glossary.find(x=>x.id===id);
-  const entry=normalizeGlossaryEntry({id:id||makeGlossaryId(),name:glossaryElement.termName.value.trim(),category:glossaryElement.termCategory.value.trim(),meaning:glossaryElement.termMeaning.value.trim(),example:glossaryElement.termExample.value.trim(),related:normalizeRelated(glossaryElement.termRelated.value),firstDay:Number(glossaryElement.termFirstDay.value)||null,understanding:Number(glossaryElement.termUnderstanding.value)||0,favorite:old?.favorite||false,createdAt:old?.createdAt||new Date().toISOString(),updatedAt:new Date().toISOString()});
+  const entry=normalizeGlossaryEntry({id:id||makeGlossaryId(),name:glossaryElement.termName.value.trim(),formalName:glossaryElement.termFormalName.value.trim()||'-',category:glossaryElement.termCategory.value.trim(),meaning:glossaryElement.termMeaning.value.trim(),example:glossaryElement.termExample.value.trim(),related:normalizeRelated(glossaryElement.termRelated.value),firstDay:Number(glossaryElement.termFirstDay.value)||null,understanding:Number(glossaryElement.termUnderstanding.value)||0,favorite:old?.favorite||false,createdAt:old?.createdAt||new Date().toISOString(),updatedAt:new Date().toISOString()});
   if(!entry.name||!entry.category||!entry.meaning){glossaryElement.glossaryStatus.textContent='用語・カテゴリ・意味は必須です。';return}
   const duplicate=state.glossary.find(x=>normalizeGlossaryName(x.name)===normalizeGlossaryName(entry.name)&&x.id!==id);
   if(duplicate){glossaryElement.glossaryStatus.textContent='同名の用語が既に登録されています。';return}
@@ -363,9 +365,9 @@ function deleteGlossaryTerm(id){const t=state.glossary.find(x=>x.id===id);if(!t|
 
 function parseGlossaryBlock(block){
   const values={};
-  block.split(/\r?\n/).forEach(line=>{const m=line.match(/^\s*(用語|カテゴリ|意味|実務例|関連用語)\s*[:：]\s*(.*)$/);if(!m)return;values[{用語:'name',カテゴリ:'category',意味:'meaning',実務例:'example',関連用語:'related'}[m[1]]]=m[2].trim()});
+  block.split(/\r?\n/).forEach(line=>{const m=line.match(/^\s*(用語|正式名称|カテゴリ|意味|実務例|関連用語)\s*[:：]\s*(.*)$/);if(!m)return;values[{用語:'name',正式名称:'formalName',カテゴリ:'category',意味:'meaning',実務例:'example',関連用語:'related'}[m[1]]]=m[2].trim()});
   if(!values.name||!values.meaning)return null;
-  return {id:makeGlossaryId(),name:values.name,category:values.category||'未分類',meaning:values.meaning,example:values.example||'',related:normalizeRelated(values.related),createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};
+  return {id:makeGlossaryId(),name:values.name,formalName:values.formalName||'-',category:values.category||'未分類',meaning:values.meaning,example:values.example||'',related:normalizeRelated(values.related),createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};
 }
 function importGlossaryFromText(){
   const text=glossaryElement.glossaryQuickInput.value.trim();if(!text){glossaryElement.glossaryStatus.textContent='取り込む文章を貼り付けてください。';return}
@@ -374,7 +376,7 @@ function importGlossaryFromText(){
   const existing=new Set(state.glossary.map(t=>normalizeGlossaryName(t.name)));const added=imported.filter(t=>!existing.has(normalizeGlossaryName(t.name)));
   state.glossary.push(...added);saveState();glossaryElement.glossaryQuickInput.value='';renderGlossary();glossaryElement.glossaryStatus.textContent=`${added.length}語を追加しました。`;
 }
-function glossaryTemplate(){return ['用語: ','カテゴリ: ','意味: ','実務例: ','関連用語: '].join('\n')}
+function glossaryTemplate(){return ['用語: ','正式名称: ','カテゴリ: ','意味: ','実務例: ','関連用語: '].join('\n')}
 
 function registerCatalogMissingTerms(){
   const before=state.glossary.length; migrateGlossaryCatalog(); const count=state.glossary.length-before;

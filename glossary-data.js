@@ -1,10 +1,28 @@
 'use strict';
 
 /* =========================================================
-   DATA PATH v3.1.1 - 用語集カタログ
+   DATA PATH v4.0 - 用語集カタログ
    ========================================================= */
 
 const GLOSSARY_PREVIEW_LIMIT = 5;
+
+const FORMAL_NAME_MAP = {
+  "KPI": "Key Performance Indicator",
+  "ETL": "Extract, Transform, Load",
+  "DAX": "Data Analysis Expressions",
+  "SQL": "Structured Query Language",
+  "T-SQL": "Transact-SQL",
+  "MDX": "Multidimensional Expressions",
+  "SaaS": "Software as a Service",
+  "PaaS": "Platform as a Service",
+  "IaaS": "Infrastructure as a Service",
+  "CSV": "Comma-Separated Values",
+  "Power BI": "Microsoft Power BI",
+  "Power Query": "Microsoft Power Query",
+  "varchar": "Variable Character",
+  "ASC": "Ascending",
+  "DESC": "Descending"
+};
 
 const GLOSSARY_CATALOG = [
   ['メトリック','分析基礎','業務や成果の状態を数値で測るための指標','応答率、AHT、ASA、放棄呼率を追い、改善が必要な場所を判断する',['KPI','データドリブン']],
@@ -135,7 +153,9 @@ const GLOSSARY_CATALOG = [
   ['Excel','データ形式','Microsoft Excelで作成・編集する表計算ファイル形式','日次の問い合わせ件数や応答時間を管理しPower BIへ取り込む',['データソース','CSV','Power Query']],
 ].map(([name,category,meaning,example,related]) => ({
   id: `catalog-${name}`,
-  name, category, meaning, example, related,
+  name,
+  formalName: FORMAL_NAME_MAP[name] || '-',
+  category, meaning, example, related,
   createdAt: '2026-07-16T00:00:00.000Z'
 }));
 

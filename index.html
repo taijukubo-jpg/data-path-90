@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>DATA PATH v3.1.1 — 90日学習管理</title>
+  <title>DATA PATH v4.0 — 90日学習管理</title>
   <link rel="stylesheet" href="styles.css">
   <script src="app.js" defer></script>
   <script src="glossary-data.js" defer></script>
@@ -197,6 +197,11 @@
           </label>
 
           <label>
+            <span>正式名称</span>
+            <input id="termFormalName" type="text" maxlength="150" placeholder="同一の場合は -">
+          </label>
+
+          <label>
             <span>カテゴリ *</span>
             <input id="termCategory" type="text" maxlength="50" required
               list="glossaryCategoryOptions"
@@ -264,6 +269,7 @@
           下の形式で貼り付けて「取り込む」を押します。1項目ずつでも複数項目でも使えます。
         </p>
         <pre>用語: DAX
+正式名称: Data Analysis Expressions
 カテゴリ: Power BI
 意味: Power BIで集計や分析を行うための数式言語
 実務例: 応答率、AHT、ASAなどのKPIを計算する
