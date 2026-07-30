@@ -1,6 +1,6 @@
 'use strict';
 
-/* DATA PATH v4.0.2 - 用語集UI */
+/* DATA PATH v4.0.3 - 用語集UI */
 let glossaryTargetId = null;
 const glossaryElementIds = [
   'homeGlossaryCount','homeGlossaryPreview','openGlossaryBtn',
@@ -60,6 +60,20 @@ function normalizeGlossaryEntry(term) {
   };
 }
 
+function catalogTermToObject(catalogTerm) {
+  if (!Array.isArray(catalogTerm)) return catalogTerm;
+
+  const [name, category, meaning, example, related = []] = catalogTerm;
+  return {
+    name,
+    formalName: FORMAL_NAME_MAP[name] || '-',
+    category,
+    meaning,
+    example,
+    related
+  };
+}
+
 function migrateGlossaryCatalog() {
   if (!Array.isArray(state.glossary)) state.glossary = [];
 
@@ -79,9 +93,10 @@ function migrateGlossaryCatalog() {
 
   let added = 0;
 
-  for (const catalogTerm of GLOSSARY_CATALOG) {
-    const normalizedName = normalizeGlossaryName(catalogTerm.name);
-    if (existing.has(normalizedName)) continue;
+  for (const rawCatalogTerm of GLOSSARY_CATALOG) {
+    const catalogTerm = catalogTermToObject(rawCatalogTerm);
+    const normalizedName = normalizeGlossaryName(catalogTerm?.name);
+    if (!normalizedName || existing.has(normalizedName)) continue;
 
     state.glossary.push(
       normalizeGlossaryEntry({
@@ -93,8 +108,8 @@ function migrateGlossaryCatalog() {
     added += 1;
   }
 
-  const needsVersionUpdate = state.dataVersion !== '4.0';
-  state.dataVersion = '4.0';
+  const needsVersionUpdate = state.dataVersion !== '4.0.3';
+  state.dataVersion = '4.0.3';
 
   if (added || needsVersionUpdate) saveState();
   return added;
