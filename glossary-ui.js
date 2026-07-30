@@ -1,7 +1,25 @@
 'use strict';
 
-/* DATA PATH v4.0.3 - 用語集UI */
+/* DATA PATH v4.0.4 - 用語集UI */
 let glossaryTargetId = null;
+
+const GLOSSARY_DATA_VERSION = '4.0.4';
+
+const GLOSSARY_NAME_ALIASES = Object.freeze({
+  '表記ゆれ': '表記揺れ',
+  'ステートメント（Statement）': 'ステートメント',
+  'Data Profiling': 'データプロファイリング',
+  'Column Quality': '列の品質',
+  'Column Distribution': '列の分布',
+  'Column Profile': '列のプロファイル',
+  'フィルター伝播（Filter Propagation）': 'フィルター伝播',
+  'カーディナリティ（Cardinality）': 'カーディナリティ',
+  'スター スキーマ（Star Schema）': 'スター スキーマ',
+  'ファクトテーブル（Fact Table）': 'ファクトテーブル',
+  'クロスフィルター方向（Cross Filter Direction）': 'クロスフィルター方向',
+  'マージ': 'マージ（Power Query）'
+});
+
 const glossaryElementIds = [
   'homeGlossaryCount','homeGlossaryPreview','openGlossaryBtn',
   'glossaryCount','glossarySearch','glossaryCategory','toggleGlossaryForm',
@@ -21,8 +39,13 @@ const glossaryElement = Object.fromEntries(
   glossaryElementIds.map((id) => [id, document.getElementById(id)])
 );
 
+function canonicalGlossaryName(value) {
+  const trimmed = String(value || '').trim();
+  return GLOSSARY_NAME_ALIASES[trimmed] || trimmed;
+}
+
 function normalizeGlossaryName(value) {
-  return String(value || '').trim().toLocaleLowerCase('ja');
+  return canonicalGlossaryName(value).toLocaleLowerCase('ja');
 }
 
 function normalizeRelated(value) {
@@ -74,45 +97,107 @@ function catalogTermToObject(catalogTerm) {
   };
 }
 
+
+function earliestDate(...values) {
+  const valid = values.filter(Boolean).map(value => new Date(value)).filter(date => !Number.isNaN(date.getTime()));
+  return valid.length ? new Date(Math.min(...valid.map(date => date.getTime()))).toISOString() : null;
+}
+
+function latestDate(...values) {
+  const valid = values.filter(Boolean).map(value => new Date(value)).filter(date => !Number.isNaN(date.getTime()));
+  return valid.length ? new Date(Math.max(...valid.map(date => date.getTime()))).toISOString() : null;
+}
+
+function mergeGlossaryMetadata(base, incoming) {
+  return normalizeGlossaryEntry({
+    ...base,
+    ...incoming,
+    id: base.id || incoming.id || makeGlossaryId(),
+    name: canonicalGlossaryName(incoming.name || base.name),
+    favorite: Boolean(base.favorite || incoming.favorite),
+    understanding: Math.max(Number(base.understanding) || 0, Number(incoming.understanding) || 0),
+    createdAt: earliestDate(base.createdAt, incoming.createdAt) || new Date().toISOString(),
+    updatedAt: latestDate(base.updatedAt, incoming.updatedAt) || new Date().toISOString(),
+    firstDay: Number(incoming.firstDay) || Number(base.firstDay) || null
+  });
+}
+
+function normalizeExistingGlossaryTerms(terms) {
+  const merged = new Map();
+
+  for (const rawTerm of terms || []) {
+    if (!rawTerm || typeof rawTerm !== 'object' || !rawTerm.name) continue;
+
+    const canonicalName = canonicalGlossaryName(rawTerm.name);
+    const normalized = normalizeGlossaryEntry({
+      ...rawTerm,
+      name: canonicalName,
+      related: normalizeRelated(rawTerm.related).map(canonicalGlossaryName)
+    });
+    const key = normalizeGlossaryName(canonicalName);
+    const current = merged.get(key);
+    merged.set(key, current ? mergeGlossaryMetadata(current, normalized) : normalized);
+  }
+
+  return [...merged.values()];
+}
+
 function migrateGlossaryCatalog() {
   if (!Array.isArray(state.glossary)) state.glossary = [];
 
-  // 旧版データを壊さないよう、移行前の内容を一度だけ別キーへ退避する。
-  const backupKey = 'data-path-glossary-backup-before-4.0';
+  const backupKey = 'data-path-glossary-backup-before-4.0.4';
   if (!localStorage.getItem(backupKey) && state.glossary.length) {
     localStorage.setItem(backupKey, JSON.stringify(state.glossary));
   }
 
-  state.glossary = state.glossary
-    .filter(term => term && typeof term === 'object' && term.name)
-    .map(normalizeGlossaryEntry);
-
-  const existing = new Set(
-    state.glossary.map(term => normalizeGlossaryName(term.name))
+  const currentTerms = normalizeExistingGlossaryTerms(state.glossary);
+  const merged = new Map(
+    currentTerms.map(term => [normalizeGlossaryName(term.name), term])
   );
 
   let added = 0;
+  let updated = 0;
 
   for (const rawCatalogTerm of GLOSSARY_CATALOG) {
-    const catalogTerm = catalogTermToObject(rawCatalogTerm);
-    const normalizedName = normalizeGlossaryName(catalogTerm?.name);
-    if (!normalizedName || existing.has(normalizedName)) continue;
+    const catalogTerm = normalizeGlossaryEntry({
+      ...catalogTermToObject(rawCatalogTerm),
+      name: canonicalGlossaryName(rawCatalogTerm?.name),
+      related: normalizeRelated(rawCatalogTerm?.related).map(canonicalGlossaryName)
+    });
+    const key = normalizeGlossaryName(catalogTerm.name);
+    if (!key) continue;
 
-    state.glossary.push(
-      normalizeGlossaryEntry({
+    const existing = merged.get(key);
+    if (!existing) {
+      merged.set(key, {
         ...catalogTerm,
         id: catalogTerm.id || makeGlossaryId()
-      })
-    );
-    existing.add(normalizedName);
-    added += 1;
+      });
+      added += 1;
+      continue;
+    }
+
+    const next = mergeGlossaryMetadata(existing, {
+      ...catalogTerm,
+      id: existing.id,
+      favorite: existing.favorite,
+      understanding: existing.understanding,
+      createdAt: existing.createdAt,
+      updatedAt: existing.updatedAt
+    });
+
+    if (JSON.stringify(existing) !== JSON.stringify(next)) updated += 1;
+    merged.set(key, next);
   }
 
-  const needsVersionUpdate = state.dataVersion !== '4.0.3';
-  state.dataVersion = '4.0.3';
+  state.glossary = [...merged.values()]
+    .sort((a, b) => a.name.localeCompare(b.name, 'ja'));
 
-  if (added || needsVersionUpdate) saveState();
-  return added;
+  const needsVersionUpdate = state.dataVersion !== GLOSSARY_DATA_VERSION;
+  state.dataVersion = GLOSSARY_DATA_VERSION;
+
+  if (added || updated || needsVersionUpdate) saveState();
+  return { added, updated };
 }
 
 function glossaryMap() {
@@ -398,8 +483,11 @@ function importGlossaryFromText(){
 function glossaryTemplate(){return ['用語: ','正式名称: ','カテゴリ: ','意味: ','実務例: ','関連用語: '].join('\n')}
 
 function registerCatalogMissingTerms(){
-  const before=state.glossary.length; migrateGlossaryCatalog(); const count=state.glossary.length-before;
-  renderGlossary(); glossaryElement.glossaryStatus.textContent=`${count}語を一括登録しました。`;
+  const result = migrateGlossaryCatalog();
+  renderGlossary();
+  glossaryElement.glossaryStatus.textContent = result.added
+    ? `${result.added}語を一括登録しました。`
+    : '定義済み用語はすべて登録済みです。';
 }
 
 // events
@@ -419,6 +507,9 @@ glossaryElement.openReviewBtn.addEventListener('click',()=>document.getElementBy
 
 document.addEventListener('datapath:statechanged', () => { renderGlossary(); });
 
-const migratedCount = migrateGlossaryCatalog();
+const migrationResult = migrateGlossaryCatalog();
 renderGlossary();
-if (migratedCount) glossaryElement.glossaryStatus.textContent = `関連用語を含む${migratedCount}語を初期登録しました。`;
+if (migrationResult.added || migrationResult.updated) {
+  glossaryElement.glossaryStatus.textContent =
+    `用語集を更新しました（追加 ${migrationResult.added}語・整理 ${migrationResult.updated}語）。`;
+}
