@@ -1,6 +1,7 @@
 'use strict';
 
-/* DATA PATH v4.0 - 用語集UI */
+/* DATA PATH v4.0.2 - 用語集UI */
+let glossaryTargetId = null;
 const glossaryElementIds = [
   'homeGlossaryCount','homeGlossaryPreview','openGlossaryBtn',
   'glossaryCount','glossarySearch','glossaryCategory','toggleGlossaryForm',
