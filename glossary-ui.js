@@ -192,7 +192,8 @@ function renderGlossary() {
     glossaryElement.glossaryList.innerHTML = '<div class="glossary-empty">条件に一致する用語がありません。</div>';
   } else {
     glossaryElement.glossaryList.innerHTML = [...groups.entries()].map(([category,items]) => {
-      const open = keywordActive || Boolean(categoryFilter);
+      const containsTarget = Boolean(glossaryTargetId) && items.some(term => term.id === glossaryTargetId);
+      const open = keywordActive || Boolean(categoryFilter) || containsTarget;
       const visible = open ? items : items.slice(0,GLOSSARY_PREVIEW_LIMIT);
       return `<details class="glossary-category" data-category="${escapeHtml(category)}" ${open ? 'open' : ''}>
         <summary><span class="glossary-category-title">${escapeHtml(category)}</span><span class="glossary-category-count">${items.length}語</span></summary>
@@ -229,9 +230,11 @@ function navigateToGlossaryTerm(id) {
   if (!term) return;
   glossaryElement.glossarySearch.value = '';
   glossaryElement.glossaryCategory.value = '';
+  glossaryTargetId = id;
   renderGlossary();
   requestAnimationFrame(() => {
     const card = document.getElementById(`term-${id}`);
+    glossaryTargetId = null;
     if (!card) return;
     card.classList.add('is-target');
     card.scrollIntoView({behavior:'smooth',block:'center'});
